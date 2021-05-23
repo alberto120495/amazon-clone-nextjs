@@ -15,7 +15,7 @@ function Orders({ orders }) {
         {session ? (
           <h2>{orders.length} Orders</h2>
         ) : (
-          <h2>Please sigh in to see your orders</h2>
+          <h2>Please sign in to see your orders</h2>
         )}
         <div className="mt-5 space-y-4">
           {orders?.map(
