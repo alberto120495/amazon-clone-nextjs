@@ -1,0 +1,14 @@
+.quickView::-webkit-scrollbar {
+  display: none;
+}
+.quickView_wrapper {
+  background: #fff;
+}
+.quickView_product_image_new {
+  max-height: 500px;
+  object-fit: cover;
+}
+.active_filter {
+  border-bottom: 1px solid #ddd;
+  width: fit-content;
+}

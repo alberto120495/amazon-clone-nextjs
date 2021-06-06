@@ -8,12 +8,25 @@ import { signIn, signOut, useSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { selectItems } from "../../slices/basketSlice";
-function Header() {
+import { useState } from "react";
+import Link from "next/link";
+function Header({ products }) {
   const [session] = useSession();
   const router = useRouter();
   const items = useSelector(selectItems);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const searchProduct = (e) => {
+    let term = e.target.value;
+    term = term.toLowerCase();
+    setSearchTerm(term);
+    setSearchResults(
+      products?.filter((product) => product.title.toLowerCase().includes(term))
+    );
+  };
   return (
-    <header className="sticky top-0 z-50 ">
+    <header className="sticky top-0 z-40 ">
       <div className="flex items-center bg-amazon_blue p-1 flex-grow py-2">
         <div className="mt-2 flex items-center flex-grow sm:flex-grow-0">
           <Image
@@ -25,12 +38,55 @@ function Header() {
             onClick={() => router.push("/")}
           />
         </div>
-        <div className="hidden sm:flex items-center h-10 rounded-md flex-grow cursor-pointer bg-yellow-400 hover:bg-yellow-500">
+        <div className="hidden relative sm:flex items-center h-10 rounded-md flex-grow cursor-pointer bg-yellow-400 hover:bg-yellow-500">
           <input
+            onBlur={() => setShowResults(false)}
+            onFocus={() => setShowResults(true)}
+            onChange={searchProduct}
+            value={searchTerm}
             type="text"
+            placeholder="Search a product..."
             className="p-2 h-full w-6 flex-grow flex-shrink rounded-l-md outline-none px-4"
           />
           <SearchIcon className="h-12 p-4" />
+          {showResults && (
+            <div
+              onMouseLeave={() => {
+                setSearchResults([]);
+                setSearchTerm("");
+              }}
+              className="absolute w-full h-auto max-h-96 top-10 border-b-2 rounded-md border-gray-100 bg-gray-50 overflow-y-scroll"
+            >
+              {searchResults?.length ? (
+                searchResults.map(({ id, title, image }, i) => (
+                  <Link href={`/details/${id}`} key={i}>
+                    <div
+                      onClick={() => console.log("hola")}
+                      className="flex justify-between p-2 mt-2 border-b-2 rounded-md border-gray-100 bg-gray-50"
+                    >
+                      <h5 className="font-medium text-sm text-gray-600">
+                        {title}
+                      </h5>
+                      <Image
+                        src={image}
+                        height={44}
+                        width={44}
+                        objectFit="contain"
+                      />
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <>
+                  {searchTerm && (
+                    <p className="text-xs text-gray-400 text-center py-2">
+                      No product found
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center text-sm space-x-6 mx-6 whitespace-nowrap text-white">
